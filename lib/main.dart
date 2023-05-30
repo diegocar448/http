@@ -1,7 +1,5 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -42,23 +40,22 @@ class _MyHomePageState extends State<MyHomePage> {
       'userId': 1,
     };
 
-    // endpoint passando o header e a url, e body se for verbo Post
-    http.Response response = await http.post(
-      Uri.parse('https://jsonplaceholder.typicode.com/posts'),
-      headers: headers,
-      body: json.encode(body),
-    );
+    final dio = Dio();
 
-    // tratar a nossa resposta
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      print(response.body);
-      // List result = json.decode(response.body);
+    try {
+      Response response = await dio.post(
+        'https://jsonplaceholder.typicode.com/posts',
+        options: Options(
+          headers: headers,
+        ),
+        data: body,
+      );
 
-      // for (var item in result) {
-      //   print(item['title']);
-      // }
-    } else {
-      print('aconteceu um erro: ${response.statusCode}');
+      //throw 'Erro customizado';
+      print(response.data);
+    } on DioError catch (e) {
+      print('Erro na request: ${e.response?.statusCode}');
+      //print('Erro generico $e');
     }
   }
 
